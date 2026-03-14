@@ -1,0 +1,41 @@
+<table class="table table-striped">
+
+<thead>
+<tr>
+<th>#</th>
+<th>Equipo</th>
+<th>PJ</th>
+<th>PG</th>
+<th>PP</th>
+<th>GF</th>
+<th>GC</th>
+<th>PTS</th>
+</tr>
+</thead>
+
+<tbody>
+
+{% for fila in tabla %}
+
+<tr>
+
+<td>{{ forloop.counter }}</td>
+
+<td>
+<img src="{{ fila.equipo.escudo.url }}" width="25">
+{{ fila.equipo.nombre }}
+</td>
+
+<td>{{ fila.pj }}</td>
+<td>{{ fila.pg }}</td>
+<td>{{ fila.pp }}</td>
+<td>{{ fila.gf }}</td>
+<td>{{ fila.gc }}</td>
+<td>{{ fila.pts }}</td>
+
+</tr>
+
+{% endfor %}
+
+</tbody>
+</table>

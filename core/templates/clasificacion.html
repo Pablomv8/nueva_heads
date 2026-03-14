@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}
+Clasificación
+{% endblock %}
+
+{% block content %}
+
+<h2 class="mb-4">Clasificación</h2>
+
+<ul class="nav nav-tabs">
+
+<li class="nav-item">
+<button class="nav-link active" data-bs-toggle="tab" data-bs-target="#grupoA">
+Grupo A
+</button>
+</li>
+
+<li class="nav-item">
+<button class="nav-link" data-bs-toggle="tab" data-bs-target="#grupoB">
+Grupo B
+</button>
+</li>
+
+</ul>
+
+
+<div class="tab-content mt-3">
+
+<div class="tab-pane fade show active" id="grupoA">
+
+{% include "tabla_clasificacion.html" with tabla=grupo_a %}
+
+</div>
+
+<div class="tab-pane fade" id="grupoB">
+
+{% include "tabla_clasificacion.html" with tabla=grupo_b %}
+
+</div>
+
+</div>
+
+{% endblock %}

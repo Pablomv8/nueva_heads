@@ -11,6 +11,9 @@ class Equipo(models.Model):
         null=True,
         blank=True
     )
+    class Grupo(models.TextChoices):
+        A = "A", "Grupo A"
+        B = "B", "Grupo B"
     nombre = models.CharField(
         max_length=100,
         unique=True
@@ -20,7 +23,8 @@ class Equipo(models.Model):
         blank=True
     )
     grupo = models.CharField(
-        max_length=1
+        max_length=1,
+        choices=Grupo.choices
     )
 
     creado = models.DateTimeField(auto_now_add=True)

@@ -1,0 +1,199 @@
+{% extends "base.html" %}
+{% load escudos %}
+{% block content %}
+
+<div class="container">
+
+<h2 class="text-center mb-4">
+
+{% if jornada %}
+Jornada {{ jornada.numero }}
+{% endif %}
+
+</h2>
+
+<!-- SELECTOR JORNADA -->
+
+<div class="row justify-content-center mb-4">
+
+<div class="col-md-4">
+
+<form method="get">
+
+<select class="form-select" name="jornada" onchange="this.form.submit()">
+
+{% for j in jornadas %}
+
+<option value="{{ j.id }}"
+{% if jornada.id == j.id %}
+selected
+{% endif %}
+>
+
+Jornada {{ j.numero }}
+
+</option>
+
+{% endfor %}
+
+</select>
+
+</form>
+
+</div>
+
+</div>
+
+<h3 class="mt-4 mb-3 text-danger text-center">
+Grupo A
+</h3>
+
+{% for partido in partidos_a %}
+
+
+
+<div class="card mb-3 shadow border-danger border-2">
+<div class="card-body">
+
+<div class="row align-items-center text-center">
+
+<!-- LOCAL -->
+<div class="col-4">
+
+<img src="{% escudo_equipo partido.local %}" width="70">
+<h5 class="mt-2">{{ partido.local.nombre }}</h5>
+
+</div>
+
+
+<!-- CENTRO -->
+<div class="col-4">
+
+{% if partido.estado == "finalizado" %}
+
+{% if partido.goles_local == partido.goles_visitante %}
+
+<h3>
+{{ partido.goles_local }} - {{ partido.goles_visitante }}
+</h3>
+
+<p class="text-muted">
+Penaltis {{ partido.penaltis_local }} - {{ partido.penaltis_visitante }}
+</p>
+
+{% else %}
+
+<h3>
+{{ partido.goles_local }} - {{ partido.goles_visitante }}
+</h3>
+
+{% endif %}
+
+
+<span class="badge bg-success">Finalizado</span>
+
+
+{% else %}
+
+<span class="badge bg-secondary">Próximamente</span>
+
+<p>
+{{ partido.fecha|date:"d M Y" }}<br>
+{{ partido.fecha|date:"H:i" }}
+</p>
+
+{% endif %}
+
+</div>
+
+
+<!-- VISITANTE -->
+<div class="col-4">
+
+<img src="{% escudo_equipo partido.visitante %}" width="70">
+<h5 class="mt-2">{{ partido.visitante.nombre }}</h5>
+
+</div>
+
+</div>
+</div>
+</div>
+
+{% endfor %}
+<h3 class="mt-5 mb-3 text-primary text-center">
+Grupo B
+</h3>
+
+{% for partido in partidos_b %}
+
+<div class="card mb-3 shadow border-primary border-2">
+<div class="card-body">
+
+<div class="row align-items-center text-center">
+
+<!-- LOCAL -->
+<div class="col-4">
+
+<img src="{% escudo_equipo partido.local %}" width="70">
+<h5 class="mt-2">{{ partido.local.nombre }}</h5>
+
+</div>
+
+
+<!-- CENTRO -->
+<div class="col-4">
+
+{% if partido.estado == "finalizado" %}
+
+{% if partido.goles_local == partido.goles_visitante %}
+
+<h3>
+{{ partido.goles_local }} - {{ partido.goles_visitante }}
+</h3>
+
+<p class="text-muted">
+Penaltis {{ partido.penaltis_local }} - {{ partido.penaltis_visitante }}
+</p>
+
+{% else %}
+
+<h3>
+{{ partido.goles_local }} - {{ partido.goles_visitante }}
+</h3>
+
+{% endif %}
+
+
+<span class="badge bg-success">Finalizado</span>
+
+
+{% else %}
+
+<span class="badge bg-secondary">Próximamente</span>
+
+<p>
+{{ partido.fecha|date:"d M Y" }}<br>
+{{ partido.fecha|date:"H:i" }}
+</p>
+
+{% endif %}
+
+</div>
+
+
+<!-- VISITANTE -->
+<div class="col-4">
+
+<img src="{% escudo_equipo partido.visitante %}" width="70">
+<h5>{{ partido.visitante.nombre }}</h5>
+
+</div>
+
+</div>
+</div>
+</div>
+
+{% endfor %}
+</div>
+
+{% endblock %}

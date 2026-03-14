@@ -61,6 +61,16 @@ class Partido(models.Model):
         blank=True
     )
 
+    penaltis_local = models.PositiveIntegerField(
+    null=True,
+    blank=True
+    )
+
+    penaltis_visitante = models.PositiveIntegerField(
+    null=True,
+    blank=True
+    )   
+
     estado = models.CharField(
         max_length=20,
         choices=Estado.choices,
@@ -90,17 +100,30 @@ class Partido(models.Model):
         return f"{self.local} vs {self.visitante}"
 
     def save(self, *args, **kwargs):
-        """
-        Solo calcula el resultado.
-        NO actualiza estadísticas.
-        """
+
         if self.estado == self.Estado.FINALIZADO:
+
             if self.goles_local is not None and self.goles_visitante is not None:
+
+                # victoria directa
                 if self.goles_local > self.goles_visitante:
                     self.resultado = self.Resultado.LOCAL
+
                 elif self.goles_local < self.goles_visitante:
                     self.resultado = self.Resultado.VISITANTE
+
+                # empate -> penaltis
                 else:
-                    self.resultado = self.Resultado.EMPATE
+
+                    if self.penaltis_local is not None and self.penaltis_visitante is not None:
+
+                        if self.penaltis_local > self.penaltis_visitante:
+                            self.resultado = self.Resultado.PENALES_LOCAL
+
+                        elif self.penaltis_visitante > self.penaltis_local:
+                            self.resultado = self.Resultado.PENALES_VISITANTE
+
+                    else:
+                        self.resultado = self.Resultado.EMPATE
 
         super().save(*args, **kwargs)

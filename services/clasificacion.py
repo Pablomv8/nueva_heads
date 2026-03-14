@@ -3,63 +3,82 @@ from apps.equipos.models import Equipo
 from apps.partidos.models import Partido
 
 
-def calcular_clasificacion(grupo: str):
-    """
-    Devuelve la tabla ordenada por:
-    - puntos
-    - diferencia de goles
-    - goles a favor
-    """
+def calcular_clasificacion():
 
-    equipos = Equipo.objects.filter(grupo=grupo)
+    tabla = defaultdict(lambda: {
+        "equipo": None,
+        "pj": 0,
+        "pg": 0,
+        "pp": 0,
+        "gf": 0,
+        "gc": 0,
+        "pts": 0
+    })
 
-    tabla = []
+    partidos = Partido.objects.filter(estado="finalizado")
 
-    for equipo in equipos:
-        partidos = Partido.objects.filter(
-            Q(local=equipo) | Q(visitante=equipo),
-            estado=Partido.Estado.FINALIZADO
-        )
+    for partido in partidos:
 
-        puntos = 0
-        goles_favor = 0
-        goles_contra = 0
-        jugados = 0
+        local = partido.local
+        visitante = partido.visitante
 
-        for partido in partidos:
-            jugados += 1
+        gl = partido.goles_local
+        gv = partido.goles_visitante
 
-            if partido.local == equipo:
-                goles_favor += partido.goles_local
-                goles_contra += partido.goles_visitante
+        tabla[local.id]["equipo"] = local
+        tabla[visitante.id]["equipo"] = visitante
 
-                if partido.resultado == Partido.Resultado.LOCAL:
-                    puntos += 3
-                elif partido.resultado == Partido.Resultado.EMPATE:
-                    puntos += 1
+        tabla[local.id]["pj"] += 1
+        tabla[visitante.id]["pj"] += 1
+
+        tabla[local.id]["gf"] += gl
+        tabla[local.id]["gc"] += gv
+
+        tabla[visitante.id]["gf"] += gv
+        tabla[visitante.id]["gc"] += gl
+
+        # GANADOR EN TIEMPO NORMAL
+        if gl > gv:
+
+            tabla[local.id]["pg"] += 1
+            tabla[local.id]["pts"] += 3
+
+            tabla[visitante.id]["pp"] += 1
+
+        elif gv > gl:
+
+            tabla[visitante.id]["pg"] += 1
+            tabla[visitante.id]["pts"] += 3
+
+            tabla[local.id]["pp"] += 1
+
+        # EMPATE -> PENALTIS
+        else:
+
+            pl = partido.penaltis_local
+            pv = partido.penaltis_visitante
+
+            if pl > pv:
+
+                tabla[local.id]["pg"] += 1
+                tabla[local.id]["pts"] += 2
+
+                tabla[visitante.id]["pp"] += 1
+                tabla[visitante.id]["pts"] += 1
 
             else:
-                goles_favor += partido.goles_visitante
-                goles_contra += partido.goles_local
 
-                if partido.resultado == Partido.Resultado.VISITANTE:
-                    puntos += 3
-                elif partido.resultado == Partido.Resultado.EMPATE:
-                    puntos += 1
+                tabla[visitante.id]["pg"] += 1
+                tabla[visitante.id]["pts"] += 2
 
-        tabla.append({
-            "equipo": equipo,
-            "puntos": puntos,
-            "jugados": jugados,
-            "gf": goles_favor,
-            "gc": goles_contra,
-            "dg": goles_favor - goles_contra,
-        })
+                tabla[local.id]["pp"] += 1
+                tabla[local.id]["pts"] += 1
 
-    # Orden oficial
-    tabla_ordenada = sorted(
-        tabla,
-        key=lambda x: (-x["puntos"], -x["dg"], -x["gf"])
+    clasificacion = list(tabla.values())
+
+    clasificacion.sort(
+        key=lambda x: (x["pts"], x["gf"] - x["gc"], x["gf"]),
+        reverse=True
     )
 
-    return tabla_ordenada
+    return clasificacion
